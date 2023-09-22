@@ -2,26 +2,168 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+
+    --primary: 220.9 39.3% 11%;
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 224 71.4% 4.1%;
+
+    --radius: .5rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%;
+    --foreground: 210 20% 98%;
+
+    --card: 224 71.4% 4.1%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 210 20% 98%;
+    --primary-foreground: 220.9 39.3% 11%;
+
+    --secondary: 215 27.9% 16.9%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 215 27.9% 16.9%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+
+    --accent: 215 27.9% 16.9%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 216 12.2% 83.9%;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.tiptap {
+  >*+* {
+    margin-top: 0.75em;
+  }
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+
+.tippy-box {
+
+  @apply bg-white;
+  @apply dark:bg-slate-400;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  @apply dark:shadow-none;
+  @apply rounded-lg;
+  max-width: 100% !important;
+  display: inline-flex;
+}
+
+.tippy-box .tippy-content .bubble button {
+  padding: .5em 1em;
+  opacity: 0.5;
+  @apply rounded-lg;
+  margin: .25rem;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  @apply transition-opacity;
+  @apply transition-colors;
+  @apply duration-200;
+  @apply ease-in-out;
+  /* transition: opacity .2s cubic-bezier(0.16, 1, 0.3, 1), background .2s cubic-bezier(0.16, 1, 0.3, 1); */
+}
+
+.tippy-box .tippy-content .bubble button:hover {
+
+  @apply opacity-80;
+  @apply bg-slate-100;
+  @apply dark:bg-slate-400;
+  @apply transition-opacity;
+  @apply transition-colors;
+  @apply duration-200;
+  @apply ease-in-out;
+  /* transition: opacity .2s cubic-bezier(0.16, 1, 0.3, 1), background .2s cubic-bezier(0.16, 1, 0.3, 1); */
+}
+
+.tippy-box .tippy-content .bubble button.is-active {
+  font-weight: 600;
+  /* background: #f0f0f0; */
+  @apply bg-slate-300;
+  @apply dark:bg-slate-600;
+  @apply opacity-100
+}
+
+.is-active {
+  font-weight: 800;
+}
+
+.tiptap {
+  padding: 1em;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.prose h1 {
+  font-size: 2.8rem;
+}
+
+.prose h2 {
+  font-size: 2rem;
+}
+
+.prose h3 {
+  font-size: 1.8rem;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: rgba(0, 0, 0, 0.25);
+  font-weight: 500;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.is-editor-empty:before {
+  @apply text-gray-300 !important;
+  @apply dark:text-gray-700 !important;
 }
