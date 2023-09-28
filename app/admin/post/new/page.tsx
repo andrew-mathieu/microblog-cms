@@ -8,8 +8,12 @@ import * as z from 'zod';
 import PocketBase from 'pocketbase';
 import Tiptap from '@/components/Tiptap';
 import type { JSONContent } from '@tiptap/react';
+import Extensions from '@/utils/TiptapExtensions';
 import type * as pb from '@/types/pocketbase-types';
-
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import { generateHTML } from '@tiptap/html';
+import { customAlphabet } from 'nanoid';
 const pocketbase = new PocketBase('http://127.0.0.1:8090');
 
 type ErrorType = {
@@ -18,26 +22,59 @@ type ErrorType = {
 };
 
 export default function NewArticle() {
-  const [isPublic, setPublic] = useState(true);
-  const [fileURL, setFileURL] = useState<string>('');
+  const router = useRouter();
   const [content, setContent] = useState<string | JSONContent | undefined>();
-  const [error, setError] = useState<ErrorType | null>(null);
-  /* 
-  TODO: Update uploadFile with Amazon S3
-  TODO: Add AlertComponent
-  */
+  const [posts, setPosts] = useState<pb.PostsResponse[]>();
+  const nanoid = customAlphabet('1234567890', 16);
 
-  const uploadFile = async (e: any) => {
-    console.log('You should think about updating this function :)');
-    /* const { data } = await supabase.storage
-      .from('posts')
-      .upload(e?.target?.files[0].name, e.target.files[0]);
-    setFileURL(data?.path as string); */
+  const checkIfAdmin = async () => {
+    const adm = await pocketbase.authStore.isAdmin;
+    if (!adm) {
+      router.push('/posts');
+    }
   };
 
-  (async () => {
-    const adm = await pocketbase.authStore.isAdmin;
-  })();
+  const fetchData = async () => {
+    try {
+      const data: pb.PostsResponse[] = await pocketbase
+        .collection('posts')
+        .getFullList();
+
+      if (data && data.length > 0) {
+        const sortedPosts = data
+          .map((post) => ({
+            ...post,
+            createdTimestamp: new Date(post.created).getTime(),
+          }))
+          .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
+          .map((post) => {
+            console.log('Post content:', post?.content);
+            return {
+              ...post,
+              content: generateHTML(post?.content as JSONContent, Extensions),
+            };
+          });
+        setPosts(sortedPosts);
+      } else {
+        console.log('No data');
+        // You can set a state here to indicate no data, and handle it in your UI
+        // For example:
+        // setPosts([]);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Handle the error, for example:
+      // setPosts([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    checkIfAdmin();
+  }, []);
 
   const handleNewPost = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,70 +82,55 @@ export default function NewArticle() {
 
     try {
       const data = await pocketbase.collection('posts').create({
-        title: formData.get('title') as string,
+        uid: nanoid(),
         content: content,
-        description: formData.get('description') as string,
-        public: isPublic,
-        slug: Slugify(formData.get('title') as string),
       });
+      await fetchData();
     } catch (err: any) {
-      if (err.status === 400) {
-        const firstDataEntryKey = Object.keys(err.response.data)[0];
-        const errorMessage = err.response.message;
-        const nestedErrorMessage = err.response.data[firstDataEntryKey].message;
-        const resultString = `"${firstDataEntryKey}": ${nestedErrorMessage}`;
-        setError(err);
-      }
+      console.error(err);
+    }
+  };
+
+  const handleDeletePost = async (id: string) => {
+    try {
+      const data = await pocketbase.collection('posts').delete(id);
+      await fetchData();
+    } catch (err: any) {
+      console.error(err);
     }
   };
 
   return (
     <>
-      <form
-        onSubmit={handleNewPost}
-        className={'grid grid-cols-2 min-h-screen'}
-      >
-        <div className={'flex flex-col gap-4 p-4 relative'}>
-          <div className="label">
-            <input
-              type="file"
-              placeholder={'Image'}
-              name="image"
-              onChange={(e) => uploadFile(e)}
-            />
-          </div>
-          <div className={'flex gap-4'}>
-            <div className="label w-full">
-              <input type="text" placeholder={'Title'} name="title" />
-            </div>
-            <div className="label w-full">
-              <input
-                type="text"
-                placeholder={'Description courte'}
-                name="description"
-              />
-            </div>
-          </div>
-
-          <div className="label">
-            <label htmlFor="public">Public</label>
-            <input
-              type="checkbox"
-              name="public"
-              defaultChecked={true}
-              checked={isPublic}
-              onChange={(e) => setPublic(e.currentTarget.checked)}
-            />
-          </div>
-          <button type="submit" className={'absolute bottom-4 right-4'}>
-            Publier
-          </button>
-        </div>
-        <div className="label h-screen overflow-y-scroll">
+      <form onSubmit={handleNewPost}>
+        <div className="h-[50vh] border-b border-zinc-900 relative">
           <Tiptap content={content} state={(e) => setContent(e)} />
-          {/* <Input type="text" placeholder={'Content'} name="content" /> */}
+          <Button
+            value={"Publier sur l'internet"}
+            type="submit"
+            className={
+              'absolute bottom-4 right-4 text-zinc-700 bg-zinc-900 px-8 py-4 rounded-lg cursor-pointer hover:bg-zinc-800 hover:text-zinc-100 font-medium transition-colors'
+            }
+          />
         </div>
       </form>
+      <div className={'p-8'}>
+        <ul className="flex flex-col gap-8">
+          {posts?.map((post) => (
+            <li key={post.id}>
+              <Card
+                id={post.id}
+                content={post.content as string}
+                date={post.created}
+                delete={true}
+                deleteFn={() => {
+                  handleDeletePost(post.id);
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }

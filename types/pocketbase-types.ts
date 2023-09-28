@@ -31,14 +31,9 @@ export type AuthSystemFields<T = never> = {
 
 // Record types for each collection
 
-
 export type PostsRecord<Tcontent = unknown> = {
 	content?: null | Tcontent
-	description?: string
-	public?: boolean
-	slug?: string
-	thumbnail?: string
-	title?: string
+	uid: string
 }
 
 export type UsersRecord = {

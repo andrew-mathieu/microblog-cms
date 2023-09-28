@@ -66,13 +66,20 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer base {
   body {
-    @apply bg-background text-foreground;
+    @apply bg-zinc-950 text-zinc-50;
   }
 }
 
@@ -90,7 +97,7 @@ input[type="checkbox"] {
 .tippy-box {
 
   @apply bg-white;
-  @apply dark:bg-slate-400;
+  @apply dark:bg-zinc-400;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   @apply dark:shadow-none;
   @apply rounded-lg;
@@ -116,8 +123,8 @@ input[type="checkbox"] {
 .tippy-box .tippy-content .bubble button:hover {
 
   @apply opacity-80;
-  @apply bg-slate-100;
-  @apply dark:bg-slate-400;
+  @apply bg-zinc-100;
+  @apply dark:bg-zinc-400;
   @apply transition-opacity;
   @apply transition-colors;
   @apply duration-200;
@@ -128,8 +135,8 @@ input[type="checkbox"] {
 .tippy-box .tippy-content .bubble button.is-active {
   font-weight: 600;
   /* background: #f0f0f0; */
-  @apply bg-slate-300;
-  @apply dark:bg-slate-600;
+  @apply bg-zinc-300;
+  @apply dark:bg-zinc-600;
   @apply opacity-100
 }
 
@@ -164,6 +171,6 @@ input[type="checkbox"] {
 }
 
 .is-editor-empty:before {
-  @apply text-gray-300 !important;
-  @apply dark:text-gray-700 !important;
+  @apply text-zinc-300 !important;
+  @apply dark:text-zinc-700 !important;
 }

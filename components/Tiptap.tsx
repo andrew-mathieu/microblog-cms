@@ -33,7 +33,7 @@ export default function Tiptap(props: Props) {
     editorProps: {
       attributes: {
         class:
-          'min-h-screen prose dark:prose-invert prose-sm sm:prose-base lg:prose-md xl:prose-xl focus:outline-none',
+          'h-[50vh] max-w-none prose dark:prose-invert prose-sm sm:prose-base lg:prose-md xl:prose-xl focus:outline-none overflow-y-scroll no-scrollbar',
       },
     },
     onUpdate: ({ editor }) => {
@@ -47,7 +47,7 @@ export default function Tiptap(props: Props) {
         <BubbleMenu
           editor={editor}
           tippyOptions={{ duration: 50 }}
-          className="bubble dark:bg-gray-700 rounded-xl"
+          className="bubble dark:bg-zinc-700 rounded-xl"
         >
           <button
             onClick={(e) => {
@@ -138,14 +138,8 @@ export default function Tiptap(props: Props) {
           </button>
         </BubbleMenu>
       )}
-      {props.isEditable === true ? (
-        <EditorContent
-          editor={editor}
-          content={JSON.stringify(props.existingContent)}
-        />
-      ) : (
-        <EditorContent editor={editor} />
-      )}
+
+      <EditorContent editor={editor} />
     </>
   );
 }
