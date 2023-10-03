@@ -1,20 +1,25 @@
-'use client';
-import { FormEvent, useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import type { Database } from '@/lib/database.types';
-import Slugify from '@/slugify';
-import * as z from 'zod';
-import PocketBase from 'pocketbase';
-import Tiptap from '@/components/Tiptap';
-import type { JSONContent } from '@tiptap/react';
-import Extensions from '@/utils/TiptapExtensions';
-import type * as pb from '@/types/pocketbase-types';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import { generateHTML } from '@tiptap/html';
-import { customAlphabet } from 'nanoid';
-const pocketbase = new PocketBase('http://127.0.0.1:8090');
+"use client";
+import {
+  FormEvent,
+  useState,
+  useMemo,
+  useEffect,
+  TextareaHTMLAttributes,
+} from "react";
+import { useRouter } from "next/navigation";
+import * as z from "zod";
+import PocketBase from "pocketbase";
+// import Tiptap from '@/components/Tiptap';
+// import type { JSONContent } from '@tiptap/react';
+// import Extensions from '@/utils/TiptapExtensions';
+import type * as pb from "@/types/pocketbase-types";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+// import { generateHTML } from '@tiptap/html';
+import { customAlphabet } from "nanoid";
+import { marked } from "marked";
+import Textarea from "@/components/ui/Textarea";
+const pocketbase = new PocketBase("http://127.0.0.1:8090");
 
 type ErrorType = {
   status: number;
@@ -23,23 +28,20 @@ type ErrorType = {
 
 export default function NewArticle() {
   const router = useRouter();
-  const [content, setContent] = useState<string | JSONContent | undefined>();
+  const [content, setContent] = useState<string>("");
   const [posts, setPosts] = useState<pb.PostsResponse[]>();
-  const nanoid = customAlphabet('1234567890', 16);
-
+  const nanoid = customAlphabet("1234567890", 16);
   const checkIfAdmin = async () => {
     const adm = await pocketbase.authStore.isAdmin;
     if (!adm) {
-      router.push('/posts');
+      router.push("/posts");
     }
   };
-
   const fetchData = async () => {
     try {
       const data: pb.PostsResponse[] = await pocketbase
-        .collection('posts')
+        .collection("posts")
         .getFullList();
-
       if (data && data.length > 0) {
         const sortedPosts = data
           .map((post) => ({
@@ -48,21 +50,20 @@ export default function NewArticle() {
           }))
           .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
           .map((post) => {
-            console.log('Post content:', post?.content);
             return {
               ...post,
-              content: generateHTML(post?.content as JSONContent, Extensions),
+              content: post?.content as string,
             };
           });
         setPosts(sortedPosts);
       } else {
-        console.log('No data');
+        console.log("No data");
         // You can set a state here to indicate no data, and handle it in your UI
         // For example:
         // setPosts([]);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
       // Handle the error, for example:
       // setPosts([]);
     }
@@ -78,13 +79,11 @@ export default function NewArticle() {
 
   const handleNewPost = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
+    const formData = new FormData();
+    formData.append("content", content as string);
+    formData.append("uid", nanoid());
     try {
-      const data = await pocketbase.collection('posts').create({
-        uid: nanoid(),
-        content: content,
-      });
+      const data = await pocketbase.collection("posts").create(formData);
       await fetchData();
     } catch (err: any) {
       console.error(err);
@@ -93,33 +92,82 @@ export default function NewArticle() {
 
   const handleDeletePost = async (id: string) => {
     try {
-      const data = await pocketbase.collection('posts').delete(id);
+      const data = await pocketbase.collection("posts").delete(id);
       await fetchData();
     } catch (err: any) {
       console.error(err);
     }
   };
 
+  const handleDrop = (event: any) => {
+    event.preventDefault();
+
+    const dataTransferItems = event?.dataTransfer?.items;
+
+    // Check if files were dropped
+    if (dataTransferItems) {
+      for (let i = 0; i < dataTransferItems.length; i++) {
+        const item = dataTransferItems[i];
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file?.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const imgMarkdown = `![Image Alt Text](${event?.target?.result} "Image Title")\n`;
+              setContent((prevMarkdown) => prevMarkdown + imgMarkdown);
+            };
+            reader.readAsDataURL(file);
+          } else {
+            setContent("Please drop an image file.\n");
+          }
+        }
+      }
+    } else {
+      // Attempt to extract URLs from dropped content
+      const plainText = event?.dataTransfer?.getData("text/plain");
+      const urls = plainText?.match(/(http|https|ftp):\/\/[^\s/$.?#].[^\s]*/gi);
+
+      if (urls && urls.length > 0) {
+        for (let i = 0; i < urls.length; i++) {
+          const imgMarkdown = `![Image Alt Text](${urls[i]} "Image Title")\n`;
+          setContent((prevMarkdown) => prevMarkdown + imgMarkdown);
+        }
+      } else {
+        setContent("Please drop an image file or a URL.\n");
+      }
+    }
+  };
+
+  const renderer = new marked.Renderer();
+  const html = marked(content! as string, { renderer });
+
   return (
     <>
       <form onSubmit={handleNewPost}>
-        <div className="h-[50vh] border-b border-zinc-900 relative">
-          <Tiptap content={content} state={(e) => setContent(e)} />
+        <div className="relative border-b border-zinc-900">
+          <Textarea
+            value={content}
+            onChange={(e) => setContent(e.currentTarget.value)}
+            onDrop={handleDrop}
+            className={
+              "min-h-[50vh] w-full resize-none bg-zinc-900 p-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
+            }
+            placeholder={"Quoi de neuf ?!"}
+          />
           <Button
-            value={"Publier sur l'internet"}
+            value={"Poster"}
             type="submit"
             className={
-              'absolute bottom-4 right-4 text-zinc-700 bg-zinc-900 px-8 py-4 rounded-lg cursor-pointer hover:bg-zinc-800 hover:text-zinc-100 font-medium transition-colors'
+              "absolute bottom-6 right-4 cursor-pointer rounded-full bg-zinc-50 px-6 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-50 hover:text-zinc-400"
             }
           />
         </div>
       </form>
-      <div className={'p-8'}>
+      <div className={"p-8"}>
         <ul className="flex flex-col gap-8">
           {posts?.map((post) => (
             <li key={post.id}>
               <Card
-                id={post.id}
                 content={post.content as string}
                 date={post.created}
                 delete={true}

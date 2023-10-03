@@ -1,44 +1,26 @@
-'use client';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import PocketBase, { ListResult } from 'pocketbase';
-import type * as pb from '@/types/pocketbase-types';
-import type { JSONContent } from '@tiptap/react';
-import Card from '@/components/ui/Card';
-import { generateHTML } from '@tiptap/html';
-import Extensions from '@/utils/TiptapExtensions';
-const pocketbase = new PocketBase('http://127.0.0.1:8090');
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import * as pocketbase from "@/lib/pb";
+import type { JSONContent } from "@tiptap/react";
+import Card from "@/components/ui/Card";
+import { generateHTML } from "@tiptap/html";
+import Extensions from "@/utils/TiptapExtensions";
 
 export default function Posts() {
-  const [posts, setPosts] = useState<pb.PostsResponse[] | null>();
+  const [posts, setPosts] = useState<pocketbase.types.PostsResponse[]>([]);
+  const [pageParam, setPageParam] = useState<number>(1);
 
   const fetchData = async () => {
     try {
-      const data: pb.PostsResponse[] = await pocketbase
-        .collection('posts')
-        .getFullList();
-
-      if (data && data.length > 0) {
-        const sortedPosts = data
-          .map((post) => ({
-            ...post,
-            createdTimestamp: new Date(post.created).getTime(),
-          }))
-          .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
-          .map((post, index) => {
-            console.log('Post content:', post?.content);
-            return {
-              key: index,
-              ...post,
-              content: generateHTML(post?.content as JSONContent, Extensions),
-            };
-          });
-        setPosts(sortedPosts);
-      } else {
-        console.log('No data');
-      }
+      const data: pocketbase.types.PostsResponse[] = await pocketbase.client
+        .collection("posts")
+        .getFullList({ sort: "-created", page: pageParam, perPage: 30 });
+      console.log(data);
+      if (!data) return;
+      setPosts(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -53,9 +35,9 @@ export default function Posts() {
           <h1>Loading…</h1>
         </>
       ) : (
-        <ul className={'flex flex-col gap-8'}>
+        <ul className={"flex flex-col gap-8"}>
           {posts?.map((post, index) => (
-            <li key={parseInt(post.id)}>
+            <li key={index}>
               <Card
                 content={post.content as string}
                 date={post.created}

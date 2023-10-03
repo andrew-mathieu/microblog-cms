@@ -32,7 +32,7 @@
     --input: 220 13% 91%;
     --ring: 224 71.4% 4.1%;
 
-    --radius: .5rem;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -84,7 +84,7 @@
 }
 
 .tiptap {
-  >*+* {
+  > * + * {
     margin-top: 0.75em;
   }
 }
@@ -93,9 +93,7 @@ input[type="checkbox"] {
   margin-right: 8px;
 }
 
-
 .tippy-box {
-
   @apply bg-white;
   @apply dark:bg-zinc-400;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
@@ -106,10 +104,10 @@ input[type="checkbox"] {
 }
 
 .tippy-box .tippy-content .bubble button {
-  padding: .5em 1em;
+  padding: 0.5em 1em;
   opacity: 0.5;
   @apply rounded-lg;
-  margin: .25rem;
+  margin: 0.25rem;
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: 500;
@@ -121,7 +119,6 @@ input[type="checkbox"] {
 }
 
 .tippy-box .tippy-content .bubble button:hover {
-
   @apply opacity-80;
   @apply bg-zinc-100;
   @apply dark:bg-zinc-400;
@@ -137,7 +134,7 @@ input[type="checkbox"] {
   /* background: #f0f0f0; */
   @apply bg-zinc-300;
   @apply dark:bg-zinc-600;
-  @apply opacity-100
+  @apply opacity-100;
 }
 
 .is-active {
