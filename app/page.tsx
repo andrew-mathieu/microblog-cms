@@ -15,26 +15,50 @@ export default function Posts() {
     try {
       const data: pocketbase.types.PostsResponse[] = await pocketbase.client
         .collection("posts")
-        .getFullList({ sort: "-created", page: pageParam, perPage: 30 });
-      console.log(data);
-      if (!data) return;
-      setPosts(data);
+        .getFullList({ sort: "-created", page: pageParam, perPage: 10 });
+      if (data && data.length > 0) setPosts(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
+    console.log(posts);
+  }, [posts]);
+
+  useEffect(() => {
     fetchData();
   }, []);
 
+  const nextPage = () => {
+    setPageParam(pageParam + 1);
+    fetchData();
+  };
+
+  const onScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop !==
+      document.documentElement.offsetHeight
+    )
+      return;
+    nextPage();
+  };
+
+  /* useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }); */
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (!posts.length) return <div className="container my-8">Loading...</div>;
+
   return (
     <div className="container my-8">
-      {!posts?.length ? (
-        <>
-          <h1>Loading…</h1>
-        </>
-      ) : (
+      haha
+      {/* {posts && (
         <ul className={"flex flex-col gap-8"}>
           {posts?.map((post, index) => (
             <li key={index}>
@@ -47,7 +71,7 @@ export default function Posts() {
             </li>
           ))}
         </ul>
-      )}
+      )} */}
     </div>
   );
 }

@@ -7,15 +7,10 @@ import {
   TextareaHTMLAttributes,
 } from "react";
 import { useRouter } from "next/navigation";
-import * as z from "zod";
 import PocketBase from "pocketbase";
-// import Tiptap from '@/components/Tiptap';
-// import type { JSONContent } from '@tiptap/react';
-// import Extensions from '@/utils/TiptapExtensions';
 import type * as pb from "@/types/pocketbase-types";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-// import { generateHTML } from '@tiptap/html';
 import { customAlphabet } from "nanoid";
 import { marked } from "marked";
 import Textarea from "@/components/ui/Textarea";
@@ -82,7 +77,11 @@ export default function NewArticle() {
     const formData = new FormData();
     formData.append("content", content as string);
     formData.append("uid", nanoid());
+
     try {
+      if (formData.get("content") === "") {
+        return;
+      }
       const data = await pocketbase.collection("posts").create(formData);
       await fetchData();
     } catch (err: any) {
