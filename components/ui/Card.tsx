@@ -8,16 +8,17 @@ import { AiOutlineLink } from "react-icons/ai";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-type Props = {
+export interface CardProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   uid?: string | number;
-  content: string | TrustedHTML;
+  content: string;
   date: string;
   delete?: boolean;
   deleteFn?: () => void;
   shareable?: boolean;
-};
+}
 
-export default function Card(props: Props) {
+export default function Card(props: CardProps) {
   const [value, copy] = useCopyToClipboard();
 
   const handleCopy = () => {

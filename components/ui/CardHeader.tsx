@@ -4,7 +4,7 @@ import SpotifyIntegration from "../SpotifyIntegration";
 import SoundcloudIntegration from "../SoundcloudIntegration";
 
 interface CardHeaderProps {
-  content: string | TrustedHTML;
+  content?: string | TrustedHTML;
 }
 
 const CardHeader = (props: CardHeaderProps) => {

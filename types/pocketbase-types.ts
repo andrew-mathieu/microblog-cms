@@ -32,7 +32,7 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type PostsRecord<Tcontent = unknown> = {
-  content?: null | Tcontent;
+  content: null | Tcontent;
   uid: string;
 };
 
@@ -55,6 +55,17 @@ export type CollectionRecords = {
   posts: PostsRecord;
   users: UsersRecord;
 };
+
+export type CollectionDetailsRecords = {
+  page: number;
+  perPage: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface PostsDetailsRecords extends CollectionDetailsRecords {
+  items: PostsRecord[];
+}
 
 export type CollectionResponses = {
   posts: PostsResponse;

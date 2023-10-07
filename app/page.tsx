@@ -1,65 +1,63 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import * as pocketbase from "@/lib/pb";
 import type { JSONContent } from "@tiptap/react";
 import Card from "@/components/ui/Card";
 import { generateHTML } from "@tiptap/html";
 import Extensions from "@/utils/TiptapExtensions";
+import type * as pocketbaseTypes from "@/types/pocketbase-types";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useClient } from "@/hooks/use-pb";
 
 export default function Posts() {
-  const [posts, setPosts] = useState<pocketbase.types.PostsResponse[]>([]);
-  const [pageParam, setPageParam] = useState<number>(1);
+  const [posts, setPosts] = useState<pocketbaseTypes.PostsRecord[]>([]);
+  const [pageParam, setPageParam] = useState<number | null>(1);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const perPage = 20;
 
   const fetchData = async () => {
     try {
-      const data: pocketbase.types.PostsResponse[] = await pocketbase.client
-        .collection("posts")
-        .getFullList({ sort: "-created", page: pageParam, perPage: 10 });
-      if (data && data.length > 0) setPosts(data);
+      if (pageParam !== null) {
+        const client = useClient("posts", {
+          sort: "-created",
+          page: pageParam,
+          perPage: perPage,
+        });
+        const data: pocketbaseTypes.PostsDetailsRecords =
+          (await client.get()) as pocketbaseTypes.PostsDetailsRecords;
+        setPosts((prevPosts) =>
+          prevPosts ? [...prevPosts, ...data.items] : data.items,
+        );
+        setTotalPages(data.totalPages);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    console.log(posts);
-  }, [posts]);
-
-  useEffect(() => {
     fetchData();
-  }, []);
+  }, [pageParam]); // Fetch data whenever pageParam changes
 
-  const nextPage = () => {
-    setPageParam(pageParam + 1);
-    fetchData();
+  const handleNextPage = () => {
+    if (pageParam !== null && totalPages !== null && pageParam < totalPages) {
+      setPageParam((prevPageParam) => prevPageParam! + 1);
+    }
   };
 
-  const onScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop !==
-      document.documentElement.offsetHeight
-    )
-      return;
-    nextPage();
-  };
-
-  /* useEffect(() => {
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }); */
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  if (!posts.length) return <div className="container my-8">Loading...</div>;
+  if (!posts?.length) return <div className="container my-8">Loading...</div>;
 
   return (
-    <div className="container my-8">
-      haha
-      {/* {posts && (
-        <ul className={"flex flex-col gap-8"}>
+    <div className="container">
+      <InfiniteScroll
+        dataLength={posts.length}
+        next={handleNextPage}
+        hasMore={
+          pageParam !== null && totalPages !== null && pageParam < totalPages
+        }
+        loader={<div>Loading...</div>}
+      >
+        <ul className={"flex flex-col"}>
           {posts?.map((post, index) => (
             <li key={index}>
               <Card
@@ -71,7 +69,7 @@ export default function Posts() {
             </li>
           ))}
         </ul>
-      )} */}
+      </InfiniteScroll>
     </div>
   );
 }
