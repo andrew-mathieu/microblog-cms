@@ -143,13 +143,13 @@ export default function NewArticle() {
   return (
     <>
       <form onSubmit={handleNewPost}>
-        <div className="relative border-b border-zinc-900">
+        <div className="relative border-b border-stone-900">
           <Textarea
             value={content}
             onChange={(e) => setContent(e.currentTarget.value)}
             onDrop={handleDrop}
             className={
-              "min-h-[50vh] w-full resize-none bg-zinc-900 p-4 text-zinc-100 placeholder:text-zinc-600 focus:outline-none"
+              "min-h-[50vh] w-full resize-none bg-stone-900 p-4 text-stone-100 placeholder:text-stone-600 focus:outline-none"
             }
             placeholder={"Quoi de neuf ?!"}
           />
@@ -157,7 +157,7 @@ export default function NewArticle() {
             value={"Poster"}
             type="submit"
             className={
-              "absolute bottom-6 right-4 cursor-pointer rounded-full bg-zinc-50 px-6 py-3 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-50 hover:text-zinc-400"
+              "absolute bottom-6 right-4 cursor-pointer rounded-full bg-stone-50 px-6 py-3 text-sm font-medium text-stone-950 transition-colors hover:bg-stone-50 hover:text-stone-400"
             }
           />
         </div>

@@ -6,7 +6,7 @@ const CardBody = ({ children }: Props) => {
   return (
     <div
       className={
-        "card relative h-full border-b border-l border-r border-zinc-900 bg-zinc-950 p-8"
+        "card relative h-full border-b border-l border-r border-stone-800 bg-stone-950 p-8"
       }
     >
       {children}

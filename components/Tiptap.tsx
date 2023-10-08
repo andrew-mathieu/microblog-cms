@@ -47,7 +47,7 @@ export default function Tiptap(props: Props) {
         <BubbleMenu
           editor={editor}
           tippyOptions={{ duration: 50 }}
-          className="bubble rounded-xl dark:bg-zinc-700"
+          className="bubble rounded-xl dark:bg-stone-700"
         >
           <button
             onClick={(e) => {
