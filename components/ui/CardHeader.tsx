@@ -83,7 +83,7 @@ const CardHeader = (props: CardHeaderProps) => {
         </div>
       </div>
       <div
-        className="card-title flex h-auto overflow-hidden overflow-ellipsis whitespace-pre-line text-xl font-medium"
+        className="card-title flex h-auto overflow-hidden overflow-ellipsis whitespace-pre-line text-xl font-medium leading-8"
         dangerouslySetInnerHTML={{
           __html: html
             .replace(

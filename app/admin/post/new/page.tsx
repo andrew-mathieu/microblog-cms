@@ -14,7 +14,7 @@ import Button from "@/components/ui/Button";
 import { customAlphabet } from "nanoid";
 import { marked } from "marked";
 import Textarea from "@/components/ui/Textarea";
-const pocketbase = new PocketBase("http://127.0.0.1:8090");
+const pocketbase = new PocketBase(process.env.POCKETBASE_URL);
 
 type ErrorType = {
   status: number;

@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { customAlphabet } from "nanoid";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
-const pocketbase = new PocketBase("http://127.0.0.1:8090");
+const pocketbase = new PocketBase(process.env.POCKETBASE_URL);
 
 export default function Posts() {
   const router = useRouter();
@@ -53,25 +53,6 @@ export default function Posts() {
   useEffect(() => {
     fetchData();
   }, [pageParam]);
-
-  useEffect(() => {
-    const listener = (e: KeyboardEvent) => {
-      if (
-        (e.code === "Enter" && e.metaKey) ||
-        (e.code === "NumpadEnter" && e.metaKey)
-      ) {
-        e.preventDefault();
-        console.log(e.code);
-        handleSubmitPost(e);
-      }
-    };
-    if (isMNPModalOpen) {
-      document.addEventListener("keydown", listener);
-      return () => {
-        document.removeEventListener("keydown", listener);
-      };
-    }
-  });
 
   const handleNextPage = () => {
     if (pageParam !== null && totalPages !== null && pageParam < totalPages) {
@@ -117,12 +98,12 @@ export default function Posts() {
     } catch (err: any) {
       console.error(err);
     }
+    setContent("");
     setIsMNPModalOpen(false);
   };
 
   if (!posts?.length) return <div className="container my-8">Loading...</div>;
 
-  // TODO: Add the ability to make new posts by pressing Shift+N (we should check if the user is admin first)
   // TODO: Sanitize HTML before posting
 
   return (
@@ -155,14 +136,14 @@ export default function Posts() {
                     value={content}
                     onChange={(e) => setContent(e.currentTarget.value)}
                     className={
-                      "h-48 w-full resize-none bg-transparent p-4 text-xl text-stone-100 placeholder:text-xl placeholder:font-medium placeholder:text-stone-600 focus:outline-none"
+                      "h-48 w-full resize-none bg-transparent p-4 text-xl text-stone-100 placeholder:text-xl placeholder:text-stone-600 focus:outline-none"
                     }
                     placeholder="Quel est votre mood actuellement ? 🤔"
                   />
                 </div>
                 <div
                   className={
-                    "flex w-full justify-end border-t border-stone-800 p-4"
+                    "flex w-full justify-end gap-4 border-t border-stone-800 p-4"
                   }
                 >
                   <Button
@@ -177,9 +158,11 @@ export default function Posts() {
                     type="button"
                     value={"Annuler"}
                     onClick={() => setIsMNPModalOpen(false)}
+                    className={
+                      "bottom-6 right-4 cursor-pointer rounded-full border border-stone-50 bg-transparent px-6 py-3 text-sm font-medium text-stone-50 transition-colors hover:bg-stone-50 hover:text-stone-400"
+                    }
                   />
                 </div>
-                {/* <button type="submit">Submit</button> */}
               </form>
             </div>
           </div>
