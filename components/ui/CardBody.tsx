@@ -1,8 +1,12 @@
-const CardBody = ({ children }: { children: React.ReactNode }) => {
+type Props = {
+  children: React.ReactNode;
+};
+
+const CardBody = ({ children }: Props) => {
   return (
     <div
       className={
-        'card p-8 rounded-xl bg-zinc-950  border-zinc-900 hover:border-zinc-800 border transition-colors h-full relative'
+        "card relative h-full border-b border-l border-r border-stone-800 bg-stone-950 p-8"
       }
     >
       {children}

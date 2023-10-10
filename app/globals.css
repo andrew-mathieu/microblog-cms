@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -32,7 +38,7 @@
     --input: 220 13% 91%;
     --ring: 224 71.4% 4.1%;
 
-    --radius: .5rem;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -79,7 +85,7 @@
 
 @layer base {
   body {
-    @apply bg-zinc-950 text-zinc-50;
+    @apply bg-stone-950 text-stone-50;
   }
 }
 
@@ -93,11 +99,9 @@ input[type="checkbox"] {
   margin-right: 8px;
 }
 
-
 .tippy-box {
-
   @apply bg-white;
-  @apply dark:bg-zinc-400;
+  @apply dark:bg-stone-400;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   @apply dark:shadow-none;
   @apply rounded-lg;
@@ -106,10 +110,10 @@ input[type="checkbox"] {
 }
 
 .tippy-box .tippy-content .bubble button {
-  padding: .5em 1em;
+  padding: 0.5em 1em;
   opacity: 0.5;
   @apply rounded-lg;
-  margin: .25rem;
+  margin: 0.25rem;
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: 500;
@@ -121,10 +125,9 @@ input[type="checkbox"] {
 }
 
 .tippy-box .tippy-content .bubble button:hover {
-
   @apply opacity-80;
-  @apply bg-zinc-100;
-  @apply dark:bg-zinc-400;
+  @apply bg-stone-100;
+  @apply dark:bg-stone-400;
   @apply transition-opacity;
   @apply transition-colors;
   @apply duration-200;
@@ -135,9 +138,9 @@ input[type="checkbox"] {
 .tippy-box .tippy-content .bubble button.is-active {
   font-weight: 600;
   /* background: #f0f0f0; */
-  @apply bg-zinc-300;
-  @apply dark:bg-zinc-600;
-  @apply opacity-100
+  @apply bg-stone-300;
+  @apply dark:bg-stone-600;
+  @apply opacity-100;
 }
 
 .is-active {
@@ -171,6 +174,16 @@ input[type="checkbox"] {
 }
 
 .is-editor-empty:before {
-  @apply text-zinc-300 !important;
-  @apply dark:text-zinc-700 !important;
+  @apply text-stone-300 !important;
+  @apply dark:text-stone-700 !important;
+}
+
+li:last-of-type .card {
+  @apply border-b-0
+}
+
+.card {
+  a {
+    text-decoration: underline;
+  }
 }

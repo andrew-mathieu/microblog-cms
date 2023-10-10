@@ -1,57 +1,19 @@
-'use client';
-import { cookies } from 'next/headers';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import type { Database } from '@/lib/database.types';
-import PocketBase from 'pocketbase';
-import Link from 'next/link';
+"use client";
+import { cookies } from "next/headers";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import PocketBase from "pocketbase";
+import Link from "next/link";
+import Button from "@/components/ui/Button";
 
-const pocketbase = new PocketBase('http://localhost:8090');
+const pocketbase = new PocketBase("https://pocketbase-container.fly.dev");
 
 export default function Home() {
   const router = useRouter();
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const supabase = createClientComponentClient<Database>();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  /* (async () => {
-    const {
-      data,
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!data) {
-      setIsLoading(true);
-    }
-    if (user) {
-      setIsLoggedIn(true);
-    }
-  })();
-
-  const handleSignIn = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    router.refresh();
-  };
-
-  const handleLogOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.log(error);
-    } else {
-      setIsLoggedIn(false);
-    }
-  };
-
-  const retrieveSession = async () => {
-    const { data, error } = await supabase.auth.getSession();
-    console.log(data);
-  }; */
 
   (async () => {
     const data = await pocketbase.authStore.model;
@@ -67,6 +29,10 @@ export default function Home() {
     // await pocketbase.admins.authWithPassword(email, password);
   };
 
+  useEffect(() => {
+    isLoggedIn ? router.push("/admin/post/new") : null;
+  });
+
   const retrieveSession = async () => {
     const data = pocketbase.authStore.token;
     console.log(data);
@@ -80,21 +46,14 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="container grid min-h-screen place-items-center">
       {isLoading ? (
         <p>Loading...</p>
-      ) : isLoggedIn ? (
-        <div className={'flex gap-4 w-[512px] p-4'}>
-          <button onClick={retrieveSession}>Retrieve session</button>
-          <button type="submit" onClick={handleLogOut}>
-            Log out
-          </button>
-          <Link href={'/admin/post/new'}>
-            <button>Create new post</button>
-          </Link>
-        </div>
       ) : (
-        <form onSubmit={handleSignIn} className={'flex gap-4 w-[512px] p-4'}>
+        <form
+          onSubmit={handleSignIn}
+          className={"flex w-[512px] flex-col gap-4 p-4"}
+        >
           <input
             type="text"
             name="email"
@@ -103,21 +62,53 @@ export default function Home() {
               setEmail(e.target.value);
             }}
             value={email}
-            placeholder={'Email'}
+            placeholder={"Email"}
+            className={
+              "w-full resize-none rounded-md bg-stone-900 p-4 text-xl text-stone-100 placeholder:text-xl placeholder:text-stone-600 focus:outline-none"
+            }
           />
-          <input
-            type="password"
-            name="password"
-            onChange={(e) => {
-              e.preventDefault();
-              setPassword(e.target.value);
-            }}
-            value={password}
-            placeholder={'Password'}
+          <div className="flex flex-col justify-end gap-2">
+            <input
+              type="password"
+              name="password"
+              onChange={(e) => {
+                e.preventDefault();
+                setPassword(e.target.value);
+              }}
+              value={password}
+              placeholder={"Password"}
+              className={
+                "w-full resize-none rounded-md bg-stone-900 p-4 text-xl text-stone-100 placeholder:text-xl placeholder:text-stone-600 focus:outline-none"
+              }
+            />
+            <Button
+              type="button"
+              value={"Show password"}
+              className={
+                "cursor-pointer text-right text-sm font-medium text-stone-100 underline hover:text-stone-400"
+              }
+              onClick={(e) => {
+                e.preventDefault();
+                const passwordInput = document.querySelector(
+                  'input[name="password"]',
+                ) as HTMLInputElement;
+                if (passwordInput.type === "password") {
+                  passwordInput.type = "text";
+                } else {
+                  passwordInput.type = "password";
+                }
+              }}
+            />
+          </div>
+          <Button
+            value={"Login"}
+            type="submit"
+            className={
+              "mt-8 w-full rounded-md bg-stone-50 p-4 font-semibold text-stone-950"
+            }
           />
-          <button type="submit">Login</button>
         </form>
       )}
-    </>
+    </div>
   );
 }
