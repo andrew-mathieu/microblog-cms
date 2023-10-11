@@ -143,10 +143,15 @@ export default function NewArticle() {
   const renderer = new marked.Renderer();
   const html = marked(content! as string, { renderer });
 
+  useEffect(() => {
+    if (!isAdmin) {
+      router.push("/admin");
+    }
+  });
   if (!isAdmin) {
-    router.push("/admin");
     return null;
   }
+
   return (
     <>
       <form onSubmit={handleNewPost}>
