@@ -97,7 +97,7 @@ export default function NewArticle() {
   if (!isAdmin) {
     return (
       <div className="container grid min-h-screen place-items-center">
-        <p>Vous n'êtes pas admin</p>
+        <p>Vous n&apos;êtes pas admin</p>
       </div>
     );
   }
