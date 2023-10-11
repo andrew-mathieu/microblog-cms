@@ -46,6 +46,6 @@ export type UsePbInstance = InstanceType<typeof UsePb>;
  * @returns {UsePbInstance} An instance of UsePb for the specified collection and query parameters.
  */
 
-export function useClient(collection: Collection, queryParams?: QueryParams): UsePbInstance {
+export function UseClient(collection: Collection, queryParams?: QueryParams): UsePbInstance {
     return new UsePb(collection, queryParams!);
 }

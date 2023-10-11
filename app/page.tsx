@@ -7,12 +7,13 @@ import { generateHTML } from "@tiptap/html";
 import Extensions from "@/utils/TiptapExtensions";
 import type * as pocketbaseTypes from "@/types/pocketbase-types";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useClient } from "@/hooks/use-pb";
+import { UseClient } from "@/hooks/use-pb";
 import PocketBase from "pocketbase";
 import { useRouter } from "next/navigation";
 import { customAlphabet } from "nanoid";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
+import Image from "next/image";
 const pocketbase = new PocketBase(process.env.POCKETBASE_URL);
 
 export default function Posts() {
@@ -32,12 +33,12 @@ export default function Posts() {
   const fetchData = async () => {
     try {
       if (pageParam !== null) {
-        const client = useClient("posts", {
+        const client = UseClient("posts", {
           sort: "-created",
           page: pageParam,
           perPage: perPage,
         });
-        console.log(useClient);
+        console.log(UseClient);
         const data: pocketbaseTypes.PostsDetailsRecords =
           (await client.get()) as pocketbaseTypes.PostsDetailsRecords;
         setPosts((prevPosts) =>
@@ -126,7 +127,7 @@ export default function Posts() {
               >
                 <div className={"flex gap-4 p-4"}>
                   <div className="author py-2">
-                    <img
+                    <Image
                       src="https://pbs.twimg.com/profile_images/1676765556815347712/c8rE28JU_x96.jpg"
                       alt="avatar"
                       className={"max-w-12 max-h-12 rounded-full object-cover"}
