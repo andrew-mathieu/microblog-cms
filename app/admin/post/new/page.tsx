@@ -6,7 +6,7 @@ import {
   useEffect,
   TextareaHTMLAttributes,
 } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import PocketBase from "pocketbase";
 import type * as pb from "@/types/pocketbase-types";
 import Card from "@/components/ui/Card";
