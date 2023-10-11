@@ -6,9 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Andrew Mathieu - Microblog",
-  description:
-    "This is where I'll primarily engage in shitposting, but not exclusively. I'll also discuss tech, share my thoughts on current events, and basically anything that comes to mind. Essentially, I want to stop using Twitter and focus more on this platform.",
+  title:
+    "Andrew Mathieu - Développeur front-end et UX/UI designer situé à Charleroi, Belgique",
 };
 
 export default function RootLayout({
