@@ -1,32 +1,33 @@
 "use client";
-import {
-  FormEvent,
-  useState,
-  useMemo,
-  useEffect,
-  TextareaHTMLAttributes,
-} from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PocketBase from "pocketbase";
-import type * as pb from "@/types/pocketbase-types";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { customAlphabet } from "nanoid";
-import { marked } from "marked";
 import Textarea from "@/components/ui/Textarea";
+import { UseClient } from "@/hooks/use-pb";
+import type * as pocketbaseTypes from "@/types/pocketbase-types";
+import InfiniteScroll from "react-infinite-scroll-component";
 const pocketbase = new PocketBase(process.env.POCKETBASE_URL);
 
-type ErrorType = {
-  status: number;
-  message: string;
+type Post = {
+  id?: string;
+  created?: string;
+  content?: string;
 };
 
 export default function NewArticle() {
   const router = useRouter();
   const [content, setContent] = useState<string>("");
-  const [posts, setPosts] = useState<pb.PostsResponse[]>();
+  const [posts, setPosts] = useState<Post[] & pocketbaseTypes.PostsRecord[]>(
+    [],
+  );
   const nanoid = customAlphabet("1234567890", 16);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [pageParam, setPageParam] = useState<number | null>(1);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const perPage = 20;
 
   const checkIfAdmin = async () => {
     const adm = await pocketbase.authStore.isAdmin;
@@ -37,42 +38,30 @@ export default function NewArticle() {
 
   const fetchData = async () => {
     try {
-      const data: pb.PostsResponse[] = await pocketbase
-        .collection("posts")
-        .getFullList();
-      if (data && data.length > 0) {
-        const sortedPosts = data
-          .map((post) => ({
-            ...post,
-            createdTimestamp: new Date(post.created).getTime(),
-          }))
-          .sort((a, b) => b.createdTimestamp - a.createdTimestamp)
-          .map((post) => {
-            return {
-              ...post,
-              content: post?.content as string,
-            };
-          });
-        setPosts(sortedPosts);
-      } else {
-        console.log("No data");
-        // You can set a state here to indicate no data, and handle it in your UI
-        // For example:
-        // setPosts([]);
+      if (pageParam !== null) {
+        const client = UseClient("posts", {
+          sort: "-created",
+          page: pageParam,
+          perPage: perPage,
+        });
+        const data: pocketbaseTypes.PostsDetailsRecords =
+          (await client.get()) as pocketbaseTypes.PostsDetailsRecords;
+        setPosts((prevPosts: any) =>
+          prevPosts ? [...prevPosts, ...data.items] : data.items,
+        );
+        setTotalPages(data.totalPages);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      // Handle the error, for example:
-      // setPosts([]);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    checkIfAdmin();
   }, []);
 
   useEffect(() => {
-    checkIfAdmin();
+    fetchData();
   }, []);
 
   const handleNewPost = async (e: FormEvent<HTMLFormElement>) => {
@@ -101,55 +90,18 @@ export default function NewArticle() {
     }
   };
 
-  const handleDrop = (event: any) => {
-    event.preventDefault();
-
-    const dataTransferItems = event?.dataTransfer?.items;
-
-    // Check if files were dropped
-    if (dataTransferItems) {
-      for (let i = 0; i < dataTransferItems.length; i++) {
-        const item = dataTransferItems[i];
-        if (item.kind === "file") {
-          const file = item.getAsFile();
-          if (file?.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-              const imgMarkdown = `![Image Alt Text](${event?.target?.result} "Image Title")\n`;
-              setContent((prevMarkdown) => prevMarkdown + imgMarkdown);
-            };
-            reader.readAsDataURL(file);
-          } else {
-            setContent("Please drop an image file.\n");
-          }
-        }
-      }
-    } else {
-      // Attempt to extract URLs from dropped content
-      const plainText = event?.dataTransfer?.getData("text/plain");
-      const urls = plainText?.match(/(http|https|ftp):\/\/[^\s/$.?#].[^\s]*/gi);
-
-      if (urls && urls.length > 0) {
-        for (let i = 0; i < urls.length; i++) {
-          const imgMarkdown = `![Image Alt Text](${urls[i]} "Image Title")\n`;
-          setContent((prevMarkdown) => prevMarkdown + imgMarkdown);
-        }
-      } else {
-        setContent("Please drop an image file or a URL.\n");
-      }
+  const handleNextPage = () => {
+    if (pageParam !== null && totalPages !== null && pageParam < totalPages) {
+      setPageParam((prevPageParam) => prevPageParam! + 1);
     }
   };
 
-  const renderer = new marked.Renderer();
-  const html = marked(content! as string, { renderer });
-
-  useEffect(() => {
-    if (!isAdmin) {
-      router.push("/admin");
-    }
-  });
   if (!isAdmin) {
-    return null;
+    return (
+      <div className="container grid min-h-screen place-items-center">
+        <p>Vous n'êtes pas admin</p>
+      </div>
+    );
   }
 
   return (
@@ -159,7 +111,6 @@ export default function NewArticle() {
           <Textarea
             value={content}
             onChange={(e) => setContent(e.currentTarget.value)}
-            onDrop={handleDrop}
             className={
               "min-h-[50vh] w-full resize-none bg-stone-900 p-4 text-stone-100 placeholder:text-stone-600 focus:outline-none"
             }
@@ -175,20 +126,29 @@ export default function NewArticle() {
         </div>
       </form>
       <div className={"p-8"}>
-        <ul className="flex flex-col gap-8">
-          {posts?.map((post) => (
-            <li key={post.id}>
-              <Card
-                content={post.content as string}
-                date={post.created}
-                delete={true}
-                deleteFn={() => {
-                  handleDeletePost(post.id);
-                }}
-              />
-            </li>
-          ))}
-        </ul>
+        <InfiniteScroll
+          dataLength={posts.length}
+          next={handleNextPage}
+          hasMore={
+            pageParam !== null && totalPages !== null && pageParam < totalPages
+          }
+          loader={<div>Loading...</div>}
+        >
+          <ul className="flex flex-col gap-8">
+            {posts?.map((post, index) => (
+              <li key={index}>
+                <Card
+                  content={post.content as string}
+                  date={post.created as string}
+                  delete={true}
+                  deleteFn={() => {
+                    handleDeletePost(post.id as string);
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </InfiniteScroll>
       </div>
     </>
   );
