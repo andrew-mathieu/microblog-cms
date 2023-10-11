@@ -26,12 +26,15 @@ export default function NewArticle() {
   const [content, setContent] = useState<string>("");
   const [posts, setPosts] = useState<pb.PostsResponse[]>();
   const nanoid = customAlphabet("1234567890", 16);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+
   const checkIfAdmin = async () => {
     const adm = await pocketbase.authStore.isAdmin;
-    if (!adm) {
-      router.push("/posts");
+    if (adm) {
+      setIsAdmin(true);
     }
   };
+
   const fetchData = async () => {
     try {
       const data: pb.PostsResponse[] = await pocketbase
@@ -140,6 +143,10 @@ export default function NewArticle() {
   const renderer = new marked.Renderer();
   const html = marked(content! as string, { renderer });
 
+  if (!isAdmin) {
+    router.push("/admin");
+    return null;
+  }
   return (
     <>
       <form onSubmit={handleNewPost}>
