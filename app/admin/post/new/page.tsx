@@ -1,6 +1,5 @@
 "use client";
 import { FormEvent, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import PocketBase from "pocketbase";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -18,7 +17,6 @@ type Post = {
 };
 
 export default function NewArticle() {
-  const router = useRouter();
   const [content, setContent] = useState<string>("");
   const [posts, setPosts] = useState<Post[] & pocketbaseTypes.PostsRecord[]>(
     [],
