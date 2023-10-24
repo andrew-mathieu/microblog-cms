@@ -1,13 +1,13 @@
-type Props = {
+interface Props extends React.AllHTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
-};
+  styling?: React.CSSProperties;
+}
 
-const CardBody = ({ children }: Props) => {
+const CardBody = ({ children, styling }: Props) => {
   return (
     <div
-      className={
-        "card relative h-full border-b border-l border-r border-stone-800 bg-stone-950 p-8"
-      }
+      className={`card w-full rounded-3xl p-8 text-black shadow-2xl md:max-w-lg`}
+      style={styling}
     >
       {children}
     </div>

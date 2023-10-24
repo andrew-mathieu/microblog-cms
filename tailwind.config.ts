@@ -11,11 +11,11 @@ module.exports = {
     container: {
       center: true,
       padding: {
-        DEFAULT: "0rem",
-        sm: "0rem",
+        DEFAULT: "1rem",
+        sm: "2rem",
         lg: "4rem",
         xl: "5rem",
-        "2xl": "8rem",
+        "2xl": "6rem",
       },
       screens: {
         sm: "640px",
@@ -25,6 +25,15 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+    extend: {
+      colors: {
+        darkBlue: "#101114",
+        'hyped-red': "#FF9595",
+        'hyped-yellow': "#FFC895",
+        'hyped-light-blue': "#D6E0E9",
+        'hyped-blue': "#ACB2E4",
+      }
+    }
   },
   plugins: [
     require("tailwindcss-animate"),

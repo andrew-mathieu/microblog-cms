@@ -66,24 +66,8 @@ const CardHeader = (props: CardHeaderProps) => {
 
   return (
     <div className={"card-header flex flex-col gap-4"}>
-      <div className={"author flex items-center gap-4"}>
-        <img
-          src="https://pbs.twimg.com/profile_images/1676765556815347712/c8rE28JU_x96.jpg"
-          className={"h-10 w-10 rounded-full object-cover"}
-        />
-        <div className={"gap flex items-center text-sm"}>
-          <span className={"font-semibold"}>Andrew</span>
-          <div className={"ml-2 flex gap-2 text-stone-600"}>
-            <span>@noonedrewandy</span>
-            <span>·</span>
-            <span title={formatDate(props.date)}>
-              <TimeAgo datetime={props.date} locale="fr" />
-            </span>
-          </div>
-        </div>
-      </div>
       <div
-        className="card-title flex h-auto overflow-hidden overflow-ellipsis whitespace-pre-line text-xl font-medium leading-8"
+        className="card-title leading flex h-auto overflow-hidden overflow-ellipsis whitespace-pre-line text-3xl font-medium"
         dangerouslySetInnerHTML={{
           __html: html
             .replace(
