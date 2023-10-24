@@ -5,8 +5,9 @@ import { Manrope } from "next/font/google";
 const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title:
-    "Andrew Mathieu - Développeur front-end et UX/UI designer situé à Charleroi, Belgique",
+  title: "Plein de petits nuages pour Andrew",
+  description:
+    "Plein de petits nuages pour faire de la pluie, plein de petits soleils pour faire du beau temps.",
 };
 
 export default function RootLayout({
