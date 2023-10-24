@@ -247,7 +247,10 @@ export default function Posts() {
         >
           <ul className="container flex h-full w-full flex-col gap-4 py-8 pt-32">
             {posts?.map((post, index) => (
-              <li className="relative flex h-full w-full even:justify-end">
+              <li
+                className="relative flex h-full w-full even:justify-end"
+                key={index}
+              >
                 <Card
                   key={index}
                   content={post.content as string}

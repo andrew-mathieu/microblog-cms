@@ -56,11 +56,11 @@ export default function NewArticle() {
 
   useEffect(() => {
     checkIfAdmin();
-  }, []);
+  });
 
   useEffect(() => {
     fetchData();
-  }, []);
+  });
 
   const handleNewPost = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
