@@ -1,14 +1,20 @@
 import React from "react";
 
 export interface TextareaProps
-  extends React.ButtonHTMLAttributes<HTMLTextAreaElement> {
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   value: string | undefined;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, children, value, ...props }, ref) => {
     return (
-      <textarea className={`${className}`} ref={ref} {...props} value={value} />
+      <textarea
+        className={`${className}`}
+        ref={ref}
+        {...props}
+        value={value}
+        maxLength={2048}
+      />
     );
   },
 );

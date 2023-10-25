@@ -245,7 +245,7 @@ export default function Posts() {
           }
           loader={<div>Loading...</div>}
         >
-          <ul className="container flex h-full w-full flex-col gap-4 py-8 pt-32">
+          <ul className="container flex h-full w-full flex-col gap-4 py-4 md:py-32">
             {posts?.map((post, index) => (
               <li
                 className="relative flex h-full w-full even:justify-end"

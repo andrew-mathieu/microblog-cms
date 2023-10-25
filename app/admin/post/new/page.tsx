@@ -8,6 +8,7 @@ import Textarea from "@/components/ui/Textarea";
 import { UseClient } from "@/hooks/use-pb";
 import type * as pocketbaseTypes from "@/types/pocketbase-types";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { AiOutlineSend } from "react-icons/ai";
 const pocketbase = new PocketBase(process.env.POCKETBASE_URL);
 
 type Post = {
@@ -23,9 +24,7 @@ export default function NewArticle() {
   );
   const nanoid = customAlphabet("1234567890", 16);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [pageParam, setPageParam] = useState<number | null>(1);
-  const [totalPages, setTotalPages] = useState<number | null>(null);
-  const perPage = 20;
+  const [isPosted, setIsPosted] = useState<boolean>(false);
 
   const checkIfAdmin = async () => {
     const adm = await pocketbase.authStore.isAdmin;
@@ -34,32 +33,8 @@ export default function NewArticle() {
     }
   };
 
-  const fetchData = async () => {
-    try {
-      if (pageParam !== null) {
-        const client = UseClient("posts", {
-          sort: "-created",
-          page: pageParam,
-          perPage: perPage,
-        });
-        const data: pocketbaseTypes.PostsDetailsRecords =
-          (await client.get()) as pocketbaseTypes.PostsDetailsRecords;
-        setPosts((prevPosts: any) =>
-          prevPosts ? [...prevPosts, ...data.items] : data.items,
-        );
-        setTotalPages(data.totalPages);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
   useEffect(() => {
     checkIfAdmin();
-  });
-
-  useEffect(() => {
-    fetchData();
   });
 
   const handleNewPost = async (e: FormEvent<HTMLFormElement>) => {
@@ -73,26 +48,25 @@ export default function NewArticle() {
         return;
       }
       const data = await pocketbase.collection("posts").create(formData);
-      await fetchData();
+      if (data) {
+        setIsPosted(true);
+        setContent("");
+      }
     } catch (err: any) {
       console.error(err);
     }
   };
 
-  const handleDeletePost = async (id: string) => {
-    try {
-      const data = await pocketbase.collection("posts").delete(id);
-      await fetchData();
-    } catch (err: any) {
-      console.error(err);
-    }
-  };
+  const [rows, setRows] = useState<number>(1);
+  const maxWidth = 600; // Largeur maximale moins 96px pour les caractères
+  const fontSize = 18;
+  const maxRows = 4;
 
-  const handleNextPage = () => {
-    if (pageParam !== null && totalPages !== null && pageParam < totalPages) {
-      setPageParam((prevPageParam) => prevPageParam! + 1);
-    }
-  };
+  useEffect(() => {
+    const lineWidth = content.length * fontSize * 0.6;
+    const lines = Math.max(1, Math.ceil(lineWidth / maxWidth));
+    setRows(Math.min(lines, maxRows));
+  }, [content]);
 
   if (!isAdmin) {
     return (
@@ -105,49 +79,28 @@ export default function NewArticle() {
   return (
     <>
       <form onSubmit={handleNewPost}>
-        <div className="relative border-b border-stone-900">
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.currentTarget.value)}
-            className={
-              "min-h-[50vh] w-full resize-none bg-stone-900 p-4 text-stone-100 placeholder:text-stone-600 focus:outline-none"
-            }
-            placeholder={"Quoi de neuf ?!"}
-          />
-          <Button
-            value={"Poster"}
-            type="submit"
-            className={
-              "absolute bottom-6 right-4 cursor-pointer rounded-full bg-stone-50 px-6 py-3 text-sm font-medium text-stone-950 transition-colors hover:bg-stone-50 hover:text-stone-400"
-            }
-          />
+        <div className="grid min-h-screen place-items-center bg-slate-50">
+          {isPosted && <p>Article posté</p>}
+          <div className="relative flex w-[600px] items-center">
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.currentTarget.value)}
+              rows={rows || 1}
+              className={
+                "w-full resize-none rounded-2xl p-8 pr-24 text-lg leading-normal shadow-xl outline-none"
+              }
+              placeholder={"Quoi de neuf ?!"}
+            />
+            <Button
+              value={<AiOutlineSend />}
+              type="submit"
+              className={
+                "absolute right-4 cursor-pointer rounded-full bg-black p-4 text-sm font-medium text-white"
+              }
+            />
+          </div>
         </div>
       </form>
-      <div className={"p-8"}>
-        <InfiniteScroll
-          dataLength={posts.length}
-          next={handleNextPage}
-          hasMore={
-            pageParam !== null && totalPages !== null && pageParam < totalPages
-          }
-          loader={<div>Loading...</div>}
-        >
-          <ul className="flex flex-col gap-8">
-            {posts?.map((post, index) => (
-              <li key={index}>
-                <Card
-                  content={post.content as string}
-                  date={post.created as string}
-                  delete={true}
-                  deleteFn={() => {
-                    handleDeletePost(post.id as string);
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
-        </InfiniteScroll>
-      </div>
     </>
   );
 }
