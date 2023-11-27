@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
       <body className={manrope.className}>
         <main>{children}</main>
       </body>
+      <GoogleTagManager gtmId="GTM-58W4429B" />
     </html>
   );
 }
