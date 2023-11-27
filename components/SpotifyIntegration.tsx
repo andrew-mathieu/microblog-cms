@@ -4,8 +4,12 @@ interface SpotifyIntegrationProps {
 }
 
 const SpotifyIntegration: FC<SpotifyIntegrationProps> = ({ url }) => {
+  const urlType = url.split("/")[4];
   const trackId = url.split("/").pop();
-  const spotifyEmbedUrl = `https://open.spotify.com/embed/track/${trackId}`;
+  const spotifyEmbedUrl =
+    urlType === "album"
+      ? `https://open.spotify.com/embed/album/${trackId}`
+      : `https://open.spotify.com/embed/track/${trackId}`;
   return (
     <iframe
       style={{ borderRadius: "12px" }}

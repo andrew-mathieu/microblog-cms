@@ -16,12 +16,16 @@ const CardHeader = (props: CardHeaderProps) => {
 
   const renderSpotifyIntegration = (content: string) => {
     const spotifyUrlRegex =
-      /https?:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?track\/([^\/?]+)(?:\?si=[^\s&]+)?/;
+      /https?:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?([^\/?]+)\/([^\/?]+)(?:\?si=[^\s&]+)?/;
     const spotifyUrlMatches = content.match(spotifyUrlRegex);
 
     if (spotifyUrlMatches && spotifyUrlMatches.length > 1) {
-      const spotifyTrackId = spotifyUrlMatches[1];
-      const spotifyEmbedUrl = `https://open.spotify.com/embed/track/${spotifyTrackId}`;
+      const spotifyType = spotifyUrlMatches[1];
+      const spotifyTrackId = spotifyUrlMatches[2];
+      const spotifyEmbedUrl =
+        spotifyType === "album"
+          ? `https://open.spotify.com/embed/album/${spotifyTrackId}`
+          : `https://open.spotify.com/embed/track/${spotifyTrackId}`;
       return <SpotifyIntegration url={spotifyEmbedUrl} />;
     }
 
@@ -71,7 +75,7 @@ const CardHeader = (props: CardHeaderProps) => {
         dangerouslySetInnerHTML={{
           __html: html
             .replace(
-              /https?:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?track\/([^\/?]+)(?:\?si=[^\s&]+)?/g,
+              /https?:\/\/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?([^\/?]+)\/([^\/?]+)(?:\?si=[^\s&]+)?/g,
               "",
             )
             .replace(

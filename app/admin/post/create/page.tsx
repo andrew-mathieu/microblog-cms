@@ -18,11 +18,15 @@ type Post = {
 };
 
 export default function NewArticle() {
+  const nanoid = customAlphabet("1234567890", 16);
   const [content, setContent] = useState<string>("");
   const [posts, setPosts] = useState<Post[] & pocketbaseTypes.PostsRecord[]>(
     [],
   );
-  const nanoid = customAlphabet("1234567890", 16);
+  const [rows, setRows] = useState<number>(1);
+  const maxWidth = 600; // Largeur maximale moins 96px pour les caractères
+  const fontSize = 18;
+  const maxRows = 4;
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isPosted, setIsPosted] = useState<boolean>(false);
 
@@ -57,11 +61,6 @@ export default function NewArticle() {
     }
   };
 
-  const [rows, setRows] = useState<number>(1);
-  const maxWidth = 600; // Largeur maximale moins 96px pour les caractères
-  const fontSize = 18;
-  const maxRows = 4;
-
   useEffect(() => {
     const lineWidth = content.length * fontSize * 0.6;
     const lines = Math.max(1, Math.ceil(lineWidth / maxWidth));
@@ -79,15 +78,14 @@ export default function NewArticle() {
   return (
     <>
       <form onSubmit={handleNewPost}>
-        <div className="grid min-h-screen place-items-center bg-slate-50">
-          {isPosted && <p>Article posté</p>}
+        <div className="grid min-h-screen place-items-center">
           <div className="relative flex w-[600px] items-center">
             <Textarea
               value={content}
               onChange={(e) => setContent(e.currentTarget.value)}
               rows={rows || 1}
               className={
-                "w-full resize-none rounded-2xl p-8 pr-24 text-lg leading-normal shadow-xl outline-none"
+                "w-full resize-none rounded-2xl p-8 pr-24 text-lg leading-normal shadow-sm outline-none"
               }
               placeholder={"Quoi de neuf ?!"}
             />

@@ -35,6 +35,7 @@ export type PostsRecord<Tcontent = unknown> = {
   created: string;
   content: null | Tcontent;
   uid: string;
+  color: string;
 };
 
 export type UsersRecord = {

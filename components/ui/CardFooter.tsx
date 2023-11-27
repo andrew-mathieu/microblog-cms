@@ -11,11 +11,14 @@ const CardFooter = (props: CardFooterProps) => {
     year: "numeric",
     month: "short",
     day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h12",
   });
 
   return (
-    <div className={"card-footer"}>
-      <span className="text-sm opacity-25"></span>
+    <div className={"card-footer mt-4 flex w-full justify-end"}>
+      <span className="text-right text-sm opacity-50">{formattedDate}</span>
     </div>
   );
 };

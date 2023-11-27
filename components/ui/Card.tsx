@@ -6,6 +6,7 @@ import Button from "./Button";
 import { useCopyToClipboard } from "@/lib/useCopyToClipboard";
 import { AiOutlineLink } from "react-icons/ai";
 import { ToastContainer, toast } from "react-toastify";
+import { BiTrash } from "react-icons/bi";
 import "react-toastify/dist/ReactToastify.css";
 
 export interface CardProps extends React.AllHTMLAttributes<HTMLDivElement> {
@@ -14,14 +15,24 @@ export interface CardProps extends React.AllHTMLAttributes<HTMLDivElement> {
   date: string;
   delete?: boolean;
   deleteFn?: () => void;
+  clickFn?: () => void;
   styling?: React.CSSProperties;
 }
 
 export default function Card(props: CardProps) {
   return (
-    <CardBody styling={props.styling}>
-      {props.delete && <Button onClick={props.deleteFn} value={"Supprimer"} />}
+    <CardBody styling={props.styling} onClick={props.clickFn}>
       <CardHeader content={props.content} date={props.date} />
+      <CardFooter date={props.date} />
+      {props.delete && (
+        <div className="flex justify-end pb-4">
+          <Button
+            onClick={props.deleteFn}
+            value={<BiTrash />}
+            className="flex items-center gap-2 rounded-xl bg-fuchsia-200 p-4 text-darkBlue transition-all hover:scale-110"
+          />
+        </div>
+      )}
     </CardBody>
   );
 }

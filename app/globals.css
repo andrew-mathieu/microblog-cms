@@ -126,3 +126,13 @@ li:last-of-type .card {
     text-decoration: underline;
   }
 }
+
+.card-title {
+  p {
+    overflow: hidden;
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+}
