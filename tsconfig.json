@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "components/Tiptap.ts"
+    "components/Tiptap.ts",
+    "components/web-vitals.js"
   ],
   "exclude": ["node_modules"]
 }

@@ -2,7 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
-
+import WebVitals from "@/components/web-vitals";
+import GoogleAnalytics from "./GoogleAnalytics";
 const manrope = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={manrope.className}>
+        <GoogleAnalytics />
         <main>{children}</main>
       </body>
       <GoogleTagManager gtmId="GTM-58W4429B" />
