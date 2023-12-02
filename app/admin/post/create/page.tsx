@@ -9,6 +9,7 @@ import { UseClient } from "@/hooks/use-pb";
 import type * as pocketbaseTypes from "@/types/pocketbase-types";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { AiOutlineSend } from "react-icons/ai";
+import colors from "@/lib/colors";
 const pocketbase = new PocketBase(process.env.POCKETBASE_URL);
 
 type Post = {
@@ -30,6 +31,8 @@ export default function NewArticle() {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [isPosted, setIsPosted] = useState<boolean>(false);
 
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
   const checkIfAdmin = async () => {
     const adm = await pocketbase.authStore.isAdmin;
     if (adm) {
@@ -46,6 +49,7 @@ export default function NewArticle() {
     const formData = new FormData();
     formData.append("content", content as string);
     formData.append("uid", nanoid());
+    formData.append("color", randomColor);
 
     try {
       if (formData.get("content") === "") {

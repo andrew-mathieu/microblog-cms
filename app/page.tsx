@@ -180,13 +180,13 @@ export default function Posts() {
               <li
                 className="relative flex h-full w-full even:justify-end"
                 key={index}
-                onClick={() => showMore(index)}
               >
                 <Card
                   key={index}
                   content={post.content as string}
                   date={post.created}
                   uid={post.uid}
+                  modal={() => showMore(index)}
                 />
               </li>
             ))}
