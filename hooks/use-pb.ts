@@ -43,7 +43,6 @@ export type UsePbInstance = InstanceType<typeof UsePb>;
  * @example
  * const usePosts = useClient('posts', { page: 1, perPage: 10 });
  * const posts = await usePosts.get();
- * yes
  * @returns {UsePbInstance} An instance of UsePb for the specified collection and query parameters.
  */
 
